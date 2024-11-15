@@ -45,11 +45,19 @@ pipeline {
     }
     stage('SonarQube Scan') {
       steps {
+        withSonarQubeEnv('SonarQube') {
+
         sh """mvn sonar:sonar \
               -Dsonar.projectKey=JavaWebApp \
               -Dsonar.host.url=http://172.31.4.143:9000 \
               -Dsonar.login=e9733df3fcd6ed54cef307d8ac4cc00eeb2d3611"""
+        }
       }
+    stage('Quality Gate'){
+      steps {
+        waitForQualityGate true
+      }
+    }
     }
     stage('Upload to Artifactory') {
       steps {
@@ -94,7 +102,7 @@ pipeline {
   post {
     always {
         echo 'Slack Notifications.'
-        slackSend channel: '#mbandi-jenkins-cicd-pipeline-alerts', //update and provide your channel name
+        slackSend channel: '#champions-batch-pipeline', //update and provide your channel name
         color: COLOR_MAP[currentBuild.currentResult],
         message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URL}"
     }
