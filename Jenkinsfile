@@ -12,28 +12,37 @@ pipeline {
     jdk 'localJdk'
   }
   stages {
-    stage('Build') {
-      steps {
-        sh 'mvn clean package'
+
+      stage('Git checkout'){
+          steps{
+              echo "Checking out source files"
+              git branch: 'main', credentialsId: 'git-token', url: 'https://github.com/Michaelgwei86/jenkins-cicd-project.git'
+          }
       }
-      post {
-        success {
-          echo ' now Archiving '
-          archiveArtifacts artifacts: '**/*.war'
+
+      stage('Build') {
+        steps {
+          sh 'mvn clean package'
+        }
+        post {
+          success {
+            echo ' now Archiving '
+            archiveArtifacts artifacts: '**/*.war'
+          }
         }
       }
-    }
-    stage('Unit Test'){
+
+      stage('Unit Test'){
         steps {
             sh 'mvn test'
         }
-    }
-    stage('Integration Test'){
+      }
+      stage('Integration Test'){
         steps {
           sh 'mvn verify -DskipUnitTests'
         }
-    }
-    stage ('Checkstyle Code Analysis'){
+      }
+      stage ('Checkstyle Code Analysis'){
         steps {
             sh 'mvn checkstyle:checkstyle'
         }
@@ -42,8 +51,8 @@ pipeline {
                 echo 'Generated Analysis Result'
             }
         }
-    }
-    stage('SonarQube Scan') {
+      }
+      stage('SonarQube Scan') {
       steps {
         withSonarQubeEnv('SonarQube') {
 
@@ -53,11 +62,12 @@ pipeline {
               -Dsonar.login=e9733df3fcd6ed54cef307d8ac4cc00eeb2d3611"""
         }
       }
-    stage('Quality Gate'){
+
+      stage('Quality Gate'){
       steps {
         waitForQualityGate true
       }
-    }
+      }
     }
     stage('Upload to Artifactory') {
       steps {
