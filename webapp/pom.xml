@@ -3,6 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
   <groupId>com.example.maven-project</groupId>
   <artifactId>maven-project</artifactId>
   <packaging>pom</packaging>
@@ -10,6 +11,7 @@
   <name>Maven Project</name>
   <description>Sample Maven project with a working, deployable site.</description>
   <url>http://www.example.com</url>
+  </parent>
 
   <properties>
     <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
